@@ -91,7 +91,7 @@ if __name__ == "__main__":
     if repositories:
         active_repositories = [repo for repo in repositories if is_recently_active(repo, threshold_date)]
         if active_repositories:
-            create_html_file(active_repositories, search_query, days_threshold,search_query,main_directory)
+            create_html_file(active_repositories, search_query, days_threshold,main_directory)
             print(f"ᲨᲔᲓᲔᲒᲘ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲗ ᲩᲐᲘᲬᲔᲠᲐ ᲤᲐᲘᲚᲨᲘ active-repo.html.")
         else:
             print("ᲐᲡᲔᲗᲘ ᲐᲥᲢᲘᲕᲝᲑᲘᲡ ᲠᲔᲞᲝᲖᲘᲢᲝᲠᲘᲔᲑᲘ ᲐᲠ ᲛᲝᲘᲫᲔᲑᲜᲐ.")
