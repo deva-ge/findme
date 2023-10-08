@@ -29,7 +29,7 @@ def is_recently_active(repo, threshold_date):
     return last_activity >= threshold_date
 
 def create_html_file(repositories, search_query, days_threshold):
-    with open("active-repo.html", "w") as file:
+    with open("dist/active-repo.html", "w") as file:
         file.write("<html><body>\n")
         file.write(f"<h1>ᲦᲘᲐ ᲡᲐᲛᲔᲪᲜᲘᲔᲠᲝ ᲠᲔᲞᲝᲖᲘᲖᲝᲠᲘᲔᲑᲘ</h1>\n")
         file.write(f"<h2>ᲫᲔᲑᲜᲘᲡ ᲞᲐᲠᲐᲛᲔᲢᲠᲔᲑᲘ: </h2>\n")
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     
     threshold_date = datetime.now() - timedelta(days=days_threshold)
     
-    access_token = "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"  # ᲩᲔᲛᲘ ᲢᲝᲙᲔᲜᲘ
+    access_token = "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"  # ᲩᲔᲛᲘ ᲢᲝᲙᲔᲜᲘ
     repositories = search_github_repositories(search_query, access_token)
 
     if repositories:
