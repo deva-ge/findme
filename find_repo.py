@@ -28,7 +28,7 @@ def is_recently_active(repo, threshold_date):
     last_activity = datetime.strptime(repo["pushed_at"], "%Y-%m-%dT%H:%M:%SZ")
     return last_activity >= threshold_date
 
-def create_html_file(repositories, search_query, days_threshold,directory="html"):
+def create_html_file(repositories, search_query, days_threshold,directory="."):
     
     
     # ᲕᲐᲛᲝᲬᲛᲔᲑᲗ ᲐᲠᲘᲡ ᲗᲣ ᲐᲠᲐ ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ
