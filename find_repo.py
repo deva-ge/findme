@@ -1,4 +1,4 @@
-import requests
+import requests, os
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
@@ -28,8 +28,17 @@ def is_recently_active(repo, threshold_date):
     last_activity = datetime.strptime(repo["pushed_at"], "%Y-%m-%dT%H:%M:%SZ")
     return last_activity >= threshold_date
 
-def create_html_file(repositories, search_query, days_threshold):
-    with open("dist/active-repo.html", "w") as file:
+def create_html_file(repositories, search_query, days_threshold,directory="html"):
+    
+    
+    # ᲕᲐᲛᲝᲬᲛᲔᲑᲗ ᲐᲠᲘᲡ ᲗᲣ ᲐᲠᲐ ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ
+    if not os.path.exists(directory):
+        # Если не существует, создаем директорию
+        os.makedirs(directory)
+        print(f"ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ '{directory}' ᲐᲠ ᲘᲧᲝ ᲓᲐ ᲨᲔᲕᲥᲛᲔᲜᲘ.")
+    
+    html_path = os.path.join(directory, "active_repo.html")
+    with open(html_path, "w") as file:
         file.write("<html><body>\n")
         file.write(f"<h1>ᲦᲘᲐ ᲡᲐᲛᲔᲪᲜᲘᲔᲠᲝ ᲠᲔᲞᲝᲖᲘᲖᲝᲠᲘᲔᲑᲘ</h1>\n")
         file.write(f"<h2>ᲫᲔᲑᲜᲘᲡ ᲞᲐᲠᲐᲛᲔᲢᲠᲔᲑᲘ: </h2>\n")
@@ -43,6 +52,15 @@ def create_html_file(repositories, search_query, days_threshold):
             file.write(f'</li>\n')
         file.write("</ul>\n")
         file.write("</body></html>")
+        file.close()
+        
+def read_token_from_file(filename):
+    try:
+        with open(filename, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        print(f"ფაილი '{filename}' ვერ მოიძებნა.")
+        return None
 
 if __name__ == "__main__":
     search_query = input("ᲨᲔᲘᲧᲕᲐᲜᲔᲗ ᲫᲔᲑᲜᲘᲡ ᲨᲔᲙᲕᲔᲗᲐ (ᲛᲐᲒᲐᲚᲘᲗᲐᲓ, 'open source'): ")
@@ -50,8 +68,10 @@ if __name__ == "__main__":
     
     threshold_date = datetime.now() - timedelta(days=days_threshold)
     
-    access_token = "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"  # ᲩᲔᲛᲘ ᲢᲝᲙᲔᲜᲘ
+    access_token = read_token_from_file('token.txt')  # ᲩᲔᲛᲘ ᲢᲝᲙᲔᲜᲘ
     repositories = search_github_repositories(search_query, access_token)
+    
+  
 
     if repositories:
         active_repositories = [repo for repo in repositories if is_recently_active(repo, threshold_date)]
