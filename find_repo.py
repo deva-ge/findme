@@ -2,6 +2,15 @@ import requests, os
 from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 
+def normalize_query(query):
+    # Заменяем пробелы на подчеркивание
+    normalized_query = query.replace(" ", "_")
+
+    # Удаляем другие недопустимые символы в именах директорий
+    normalized_query = ''.join(char for char in normalized_query if char.isalnum() or char in ['_', '-'])
+
+    return normalized_query
+
 def search_github_repositories(query, access_token):
     headers = {
         "Authorization": f"Bearer {access_token}"
@@ -28,16 +37,20 @@ def is_recently_active(repo, threshold_date):
     last_activity = datetime.strptime(repo["pushed_at"], "%Y-%m-%dT%H:%M:%SZ")
     return last_activity >= threshold_date
 
-def create_html_file(repositories, search_query, days_threshold,directory="."):
+def create_html_file(repositories, search_query, days_threshold,main_directory="."):
+
+    normalized_search_query = normalize_query(search_query)
+
+    html_directory = os.path.join(main_directory, normalized_search_query)
     
     
-    # ᲕᲐᲛᲝᲬᲛᲔᲑᲗ ᲐᲠᲘᲡ ᲗᲣ ᲐᲠᲐ ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ
-    if not os.path.exists(directory):
-        # Если не существует, создаем директорию
-        os.makedirs(directory)
-        print(f"ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ '{directory}' ᲐᲠ ᲘᲧᲝ ᲓᲐ ᲨᲔᲕᲥᲛᲔᲜᲘ.")
+     # ᲕᲐᲛᲝᲬᲛᲔᲑᲗ ᲐᲠᲘᲡ ᲗᲣ ᲐᲠᲐ ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ
+    if not os.path.exists(html_directory):
+        # თუ არ არსებობს, ვქმნით დირექტორიას
+        os.makedirs(html_directory)
+        print(f"ᲓᲘᲠᲔᲥᲢᲝᲠᲘᲐ '{normalized_search_query}' ᲐᲠ ᲘᲧᲝ ᲓᲐ ᲨᲔᲕᲥᲛᲔᲜᲘ.")
     
-    html_path = os.path.join(directory, "active_repo.html")
+    html_path = os.path.join(html_directory, "active_repo.html")
     with open(html_path, "w") as file:
         file.write("<html><body>\n")
         file.write(f"<h1>ᲦᲘᲐ ᲡᲐᲛᲔᲪᲜᲘᲔᲠᲝ ᲠᲔᲞᲝᲖᲘᲖᲝᲠᲘᲔᲑᲘ</h1>\n")
@@ -65,6 +78,8 @@ def read_token_from_file(filename):
 if __name__ == "__main__":
     search_query = input("ᲨᲔᲘᲧᲕᲐᲜᲔᲗ ᲫᲔᲑᲜᲘᲡ ᲨᲔᲙᲕᲔᲗᲐ (ᲛᲐᲒᲐᲚᲘᲗᲐᲓ, 'open source'): ")
     days_threshold = int(input("ᲨᲔᲘᲧᲕᲐᲜᲔᲗ ᲓᲦᲔᲔᲑᲘᲡ ᲠᲐᲝᲓᲔᲜᲝᲑᲐ ᲠᲔᲞᲝᲖᲘᲢᲝᲠᲘᲘᲡ ᲐᲥᲢᲘᲕᲝᲑᲘᲡ ᲒᲐᲜᲡᲐᲖᲐᲖᲦᲕᲠᲐᲓ: "))
+
+    main_directory = "repos"
     
     threshold_date = datetime.now() - timedelta(days=days_threshold)
     
@@ -76,7 +91,7 @@ if __name__ == "__main__":
     if repositories:
         active_repositories = [repo for repo in repositories if is_recently_active(repo, threshold_date)]
         if active_repositories:
-            create_html_file(active_repositories, search_query, days_threshold,search_query)
+            create_html_file(active_repositories, search_query, days_threshold,search_query,main_directory)
             print(f"ᲨᲔᲓᲔᲒᲘ ᲬᲐᲠᲛᲐᲢᲔᲑᲘᲗ ᲩᲐᲘᲬᲔᲠᲐ ᲤᲐᲘᲚᲨᲘ active-repo.html.")
         else:
             print("ᲐᲡᲔᲗᲘ ᲐᲥᲢᲘᲕᲝᲑᲘᲡ ᲠᲔᲞᲝᲖᲘᲢᲝᲠᲘᲔᲑᲘ ᲐᲠ ᲛᲝᲘᲫᲔᲑᲜᲐ.")
